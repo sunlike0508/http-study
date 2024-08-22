@@ -93,6 +93,34 @@ IP는 변경될 수 있다.
 
 # URI와 웹 브라우저 요청 흐름
 
+## URI
+
+Uniform Resource Identifier
+
+리소스 식별하는 통일된 방식, 자원(URI로 식별할 수 있는 모든 것), 다른 항목과 구분하는데 필요한 정보
+
+URL : locator (리소스가 있는 위치)
+URN : Name : 리소스에 이름을 부여 (거의 잘 안쓴다. 보편화가 되지 않음)
+
+### 전체 문법
+
+• scheme://[userinfo@]host[:port][/path][?query][#fragment]
+
+• https://www.google.com:443/search?q=hello&hl=ko
+
+• 프로토콜(https)
+
+• 호스트명(www.google.com)
+
+• 포트 번호(443)
+
+• 패스(/search)
+
+• 쿼리 파라미터(q=hello&hl=ko)
+
+* fragment : html 내부 북마크 등에 사용, 서버에 전송하는 정보 아님 (잘 사용 안함)
+
+
 
 
 
