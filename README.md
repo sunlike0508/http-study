@@ -270,7 +270,151 @@ HTML Form 전송은 GET, POST만 지원
 클라이언트가 재시도하면 성공할 수도 있음
 
 * 500 : Internal Servever Error
-* 503 : Service Unavailable, 서버가 일시적 과부하. 
+* 503 : Service Unavailable, 서버가 일시적 과부하.
+
+# HTTP 헤더
+
+http 전송에 필요한 모든 부가정보를 가지고 있음
+
+헤더의 표준이 너무나 많음.
+
+## 헤더 분류
+
+RFC2616 (1999년) 이게 표준이었는데 이제 폐기
+
+FRC723X (2015년)으로 변화
+
+엔티티라는 말을 표현이라고 변경(요청이나 응답에 전달할 실제 데이터)
+
+표현 헤더는 표현 데이터를 해석할 수 있는 정보 제공
+
+메시지 본문 (message body) -> payload 라고 변경
+
+### 표현
+
+표현 헤더는 전송, 응답 둘다 사용
+
+### 협상 
+
+클라이언트가 선호하는 표현 요청
+
+협상 헤더는 요청시에만 사용
+
+ex) Accept-Language : 클라이언트가 선호하는 자연언어
+
+1) 우선순위1
+
+Quality Values 값 사용
+
+0 ~ 1 클수록 높은 우선순위
+
+생략하면 1
+
+ex) Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+
+2) 우선순위2
+
+구체적인 것이 우선한다.
+
+Accept: text/*, text/plain, text/plain;format=flowed, */*
+
+text/plain;format=flowed 이게 1순위, 그 다음 text/plain
+
+3) 우선순위3
+
+구체적인 것을 기준으로 미디어 타입을 맞춘다.
+
+여기까진 잘 안쓴다.
+
+
+### 전송 방식
+
+단순 전송
+
+압축 전송 : content-encoding : gzip
+
+분할 전송 : 헤더에 transfer-encoding : chunked 이렇게 보냄, content-length 필요없음
+
+범위 전송
+
+### 일반 정보
+
+* From : 유버 에이전트의 이메일 정보, 잘 사용 안함
+* Referer : 이전 웹 페이지 주소. 유입 경로를 알 수 있음. 원래는 referreer의 오타. 근데 굳어져버려서 이렇게 쓰는 중
+* User-Agent : 클라이언트 애플리케이션 정보
+* Server : 요청을 처리하는 origin 서버의 소프트웨어 정보.
+* Date : 메시지가 발생한 날짜와 시간
+
+### 특별한 정보
+
+* host : 요청한 호스트 정보(도메인). 필수. 하나의 서버에 여러 개의 가상호스트를 운영할때 유용.
+* location : 페이지 리다이랙션. 201, 3xx 에서 많이 쓰임
+* allow : 허용 가능한 http 메서드, 405에서 응답에 포함해야 함. 잘 안씀
+* retry-after : 유저가 다음 요청을 하기까지 기다려야 하는 시간.
+
+### 인증
+
+* Authorization : 클라이언트 인증 정보를 서버에 전달,
+   * Authorizatino : Basic xxxxxx
+* WWW-Authenticate : 리소스 접근 시 필요한 인증 방법 정의, 401과 응답에 함께 사용.
+
+### 쿠키
+
+* Set-Cookie : 서버에서 클라이언트로 쿠키 전달(응답)
+* Cookie : 클라이언트가 서버에서 받은 쿠키를 저장하고, http 요청시 헤더로 전달
+
+* 주 사용처
+   * 로그인
+   * 광고 정보 트래킹
+* 쿠키 정보는 항상 서버에 전송됨
+   * 네트워크 트래픽 추가 유발
+   * 최소한의 정보만 사용(세선id, 인증 토큰)
+   * 서버에 전송하지 않고 웹 브라우저 내부에 데이터를 저장하고 싶으면 웹 스토리지 사용
+ 
+***보안에 민감한 데이터는 저장하면 안된다. (주민번호, 신용카드 번호 등등)***
+
+#### 생명주기
+
+Expires : 만료일 되면 쿠키 삭제, GMT 기준으로 넣어줘야함.
+
+max-age : 음수 넣으면 쿠키 삭제
+
+#### 도메인
+
+• 예) domain=example.org
+• 명시: 명시한 문서 기준 도메인 + 서브 도메인 포함
+   • domain=example.org를 지정해서 쿠키 생성
+   • example.org는 물론이고
+   • dev.example.org도 쿠키 접근
+• 생략: 현재 문서 기준 도메인만 적용
+   • example.org 에서 쿠키를 생성하고 domain 지정을 생략
+   • example.org 에서만 쿠키 접근
+   • dev.example.org는 쿠키 미접근
+
+#### 경로
+
+ ex) path=/home
+
+이 경로를 포함한 하위 경로 페이지만 쿠키 접근
+
+일반적으로 path=/루트로 기정
+
+#### 보안
+
+* Secure
+   * http, https를 구분하지 않고 전송
+   * 이걸 적용하면 https인 경우에만 전송
+ 
+* httpOnly
+   * XSS 공격 방지
+   * 자바스크립트에서 접근 불가
+   * http 전송에만 사용
+ 
+* SameSite
+   * XSRF 공격 방지
+   * 요청 도메인과 쿠키에 설정된 도메인이 같은 경우만 쿠키 전송
+ 
+## 캐시 
 
 
 
