@@ -149,7 +149,53 @@ UDP : HTTP/3
 
 # HTTP Method
 
+GET, POST, PUT, PATCH, DELETE
 
+## 속성
+
+### 안전
+
+호출해도 리소스를 변경하지 않는다.
+
+계속 호출해서 로그가 쌓여서 장애가 발생하면? 그런 부가적인것은 고려하지 않는다. 순수 리소스의 변경만 고려한다.
+
+### 멱등성 (Idempotent)
+
+f(f(x)) = f(x)
+
+한 번 호출하든 두 번 호출하든 100번 하든 결과는 똑같다.
+
+GET, PUT, DELETE : 멱등이다.
+
+POST는 멱등이 아니다.
+
+* 자동 복구 메커니즘 : 서버가 타임아웃등 정상 응답을 주지 못할때, 클라이언트가 같은 요청을 보낼 수 있다.
+
+**멱등은 외부 요인으로 중간에 리소스가 변경되는것 까지는 고려하지 않는다.**
+
+### 캐시가능
+
+응답 결과 리소스를 캐시해서 사용해도 되는가?
+
+GET, HEAD, POST, PATCH 캐시 가능. 그러나 현실적으로 GET, HEAD만 캐시가 가능. 그 외는 body로 인해 구현이 쉽지 않음
+
+
+# HTTP Method 활용
+
+multipart/form-data : 파일 업로드 같은 바이너리 데이터 전송시 사용
+
+HTML Form 전송은 GET, POST만 지원
+
+1) 정적 데이터 조회
+2) 동적 데이터 조회
+3) HTML FORM을 통한 데이터 전송
+4) HTTP API 전송
+
+* PUT : 클라이언트가 리소스 URI를 알고 있어야 한다. 즉, 클라이언트가 자원을 알고 관리한다는 의미.
+
+* URI 설계 참고 사이트 : https://restfulapi.net/resource-naming
+
+* HTTP 메서드로 표현하기 힘든 것들은 동사를 직접 사용 ex) html form에서 멤버 삭제 : /members/{id}/delete
 
 
 
